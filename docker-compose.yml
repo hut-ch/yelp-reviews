@@ -6,14 +6,14 @@ services:
     image: hut-ch/dbt-yelp:dev
     volumes:
       - ./:/yelp-reviews:cached
-      - .dbt:/root/.dbt:cached
     command: sleep infinity
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
 
-  db:
+  postgres:
     image: postgres:16-alpine
+    container_name: postgres-yelp
     hostname: pg-yelp
     restart: unless-stopped
     volumes:
@@ -29,3 +29,19 @@ services:
       interval: 10s
       timeout: 30s
       retries: 5
+
+  pgadmin:
+    container_name: pgadmin-yelp
+    hostname: pgadmin
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=yelp@reviews.com
+      - PGADMIN_DEFAULT_PASSWORD=yelp
+    ports:
+      - '8080:80'
+    #volumes:
+    #  - ./config/pgadmin-servers.json:/pgadmin4/servers.json
+    depends_on:
+      postgres:
+        condition: service_healthy

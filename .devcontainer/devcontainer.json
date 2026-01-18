@@ -16,6 +16,7 @@
 		"vscode": {
 			"extensions": [
 				//"dbtLabsInc.dbt",
+				"innoverio.vscode-dbt-power-user",
 				"ms-python.python",
 				"ms-python.flake8",
 				"ms-python.mypy-type-checker",

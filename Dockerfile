@@ -25,18 +25,20 @@ RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* \
     && rm -rf /wheels /root/.cache/pip
 
 # Create a custom user with UID 1234 and GID 1234
-#RUN groupadd -g 1234 pygroup \
-#    && useradd -m -u 1234 -g pygroup pyuser \
-#    && chown -R pyuser:pygroup /home/pyuser \
+RUN groupadd -g 1234 pygroup \
+    && useradd -m -u 1234 -g pygroup pyuser \
+    && chown -R pyuser:pygroup /home/pyuser
    # && mkdir -p /logs/python \
    # && chmod -R 777 /logs
 
 # Switch to the custom user
-#USER pyuser
+USER pyuser
 
 # Set the workdir
-#WORKDIR /home/pyuser
+WORKDIR /home/pyuser
+RUN mkdir -p /home/pyuser/.dbt
+COPY profiles.yml /home/pyuser/.dbt
 
-#ENV PATH="/home/pyuser/.local/bin:$PATH"
+ENV PATH="/home/pyuser/.local/bin:$PATH"
 
 CMD ["sleep", "infinity"]

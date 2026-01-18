@@ -1,0 +1,76 @@
+version: 2
+
+sources:
+  - name: yelp_raw
+    description: "Raw Yelp academic dataset tables loaded from JSON files"
+    database: yelp
+    schema: public
+    tables:
+      - name: raw_yelp_business
+        description: "Raw business information from Yelp"
+        columns:
+          - name: business_id
+            description: "Unique business identifier"
+            data_tests:
+              - unique
+              - not_null
+          - name: name
+            description: "Business name"
+          - name: address
+            description: "Street address"
+          - name: city
+            description: "City name"
+          - name: state
+            description: "State abbreviation"
+          - name: postal_code
+            description: "Postal/zip code"
+          - name: latitude
+            description: "Latitude coordinate"
+          - name: longitude
+            description: "Longitude coordinate"
+          - name: stars
+            description: "Average star rating"
+          - name: review_count
+            description: "Total number of reviews"
+          - name: is_open
+            description: "Whether business is currently open"
+          - name: attributes
+            description: "JSON object with business attributes (parking, WiFi, etc.)"
+          - name: categories
+            description: "Comma-separated list of business categories"
+          - name: hours
+            description: "JSON object with operating hours by day"
+
+      - name: raw_yelp_review
+        description: "Raw review data from Yelp"
+        columns:
+          - name: review_id
+            description: "Unique review identifier"
+            data_tests:
+              - unique
+              - not_null
+          - name: user_id
+            description: "ID of user who wrote review"
+            data_tests:
+              - not_null
+          - name: business_id
+            description: "ID of business being reviewed"
+            data_tests:
+              - not_null
+          - name: stars
+            description: "Star rating given in review (1-5)"
+          - name: date
+            description: "Date review was posted"
+          - name: text
+            description: "Review text content"
+          - name: useful
+            description: "Count of users who marked review as useful"
+          - name: funny
+            description: "Count of users who marked review as funny"
+          - name: cool
+            description: "Count of users who marked review as cool"
+models:
+  - name: stg_yelp_review
+    description: "reviews data"
+  - name: stg_yelp_business
+    description: "test description"

@@ -1,0 +1,40 @@
+version: 1
+
+intermediate_models:
+  - name: intermediate_yelp_aggregated
+    description: "Intermediate model for Yelp business and reviews data with cleaned and transformed fields"
+    database: yelp
+    schema: public
+    tables:
+      - name: int_yelp_business_reviews_agg
+        description: "Aggregated Reviews data for each business"
+        columns:
+          - name: business_id
+            description: "Unique business identifier"
+          - name: business_name
+            description: "Business name"
+          - name: city
+            description: "City name"
+          - name: state
+            description: "State abbreviation"
+          - name: business_rating
+            description: "Average star rating for the business"
+          - name: total_reviews
+            description: "Ttoal nmuber of reviews for the business"
+          - name: is_open,
+            description: "Indicator if the business is currently open (1) or closed (0)"
+          - name: review_count_calculated,
+            description: "Calculated total number of reviews from the reviews dataset"
+          - name: avg_review_rating,
+            description: "Average star rating from the reviews dataset"
+          - name: min_review_rating,
+            description: "Minimum star rating from the reviews dataset"
+          - name: max_review_rating,
+            description: "Maximum star rating from the reviews dataset"
+          - name: latest_review_date,
+            description: "Date of the most recent review for the business"
+          - name: avg_reactions_per_review
+            description: "Average number of reactions (useful, funny, cool) per review for the business"
+models:
+  - name: int_business_reviews_agg
+    description: aggregated reviews data for each business

@@ -1,0 +1,12 @@
+yelp:
+  outputs:
+    dev:
+      dbname: yelp
+      host: pg-yelp
+      pass: postgres
+      port: 5432
+      schema: public
+      threads: 1
+      type: postgres
+      user: postgres
+  target: dev
