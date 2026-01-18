@@ -1,3 +1,7 @@
+"""import raw Yelp review data into PostgreSQL database"""
+
+from typing import Generator, Optional
+
 import pandas as pd
 from sqlalchemy import create_engine, engine
 from sqlalchemy.dialects.postgresql import DATE, INTEGER, TEXT
@@ -10,7 +14,7 @@ from sqlalchemy.exc import (
 )
 
 
-def get_db_engine() -> engine.Engine | None:
+def get_db_engine() -> Optional[engine.Engine]:
     """Create a db engine to be used by other functions
 
     Args:
@@ -43,7 +47,7 @@ def get_db_engine() -> engine.Engine | None:
     return None
 
 
-def read_raw_review_data() -> pd.DataFrame:
+def read_raw_review_data() -> Generator[pd.DataFrame, None, None]:
     """Generator that reads JSON file in chunks to avoid memory issues"""
     chunk_size = 10000
     for chunk in pd.read_json(
@@ -52,10 +56,16 @@ def read_raw_review_data() -> pd.DataFrame:
         yield chunk
 
 
-def load_raw_review_data(engine: engine.Engine) -> None:
+def load_raw_review_data(engine_instance: engine.Engine) -> None:
+    """
+    Load raw Yelp review data into the database.
+
+    :param engine_instance: SQLAlchemy engine instance
+    :type engine_instance: engine.Engine
+    """
     try:
         first_chunk = True
-        with engine.connect() as connection:
+        with engine_instance.connect() as connection:
             for chunk in read_raw_review_data():
                 chunk.to_sql(
                     "raw_yelp_review",
@@ -76,15 +86,15 @@ def load_raw_review_data(engine: engine.Engine) -> None:
                     },
                 )
                 first_chunk = False
-                print(f"Loaded chunk successfully.")
+                print("Loaded chunk successfully.")
     except (IntegrityError, InternalError, OperationalError, ProgrammingError) as e:
         raise RuntimeError(f"Error loading data into database: {e}") from e
 
 
 if __name__ == "__main__":
-    engine = get_db_engine()
-    if engine is not None:
-        load_raw_review_data(engine)
+    db_engine = get_db_engine()
+    if db_engine is not None:
+        load_raw_review_data(engine_instance=db_engine)
         print("Raw review data loaded successfully.")
     else:
         print("Failed to create database engine.")

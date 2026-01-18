@@ -1,3 +1,7 @@
+"""import raw Yelp buisiness data into PostgreSQL database"""
+
+from typing import Generator, Optional
+
 import pandas as pd
 from sqlalchemy import create_engine, engine
 from sqlalchemy.dialects.postgresql import BOOLEAN, FLOAT, INTEGER, JSONB, TEXT
@@ -10,7 +14,7 @@ from sqlalchemy.exc import (
 )
 
 
-def get_db_engine() -> engine.Engine | None:
+def get_db_engine() -> Optional[engine.Engine]:
     """Create a db engine to be used by other functions
 
     Args:
@@ -43,48 +47,59 @@ def get_db_engine() -> engine.Engine | None:
     return None
 
 
-def read_raw_business_data() -> pd.DataFrame:
-    df = pd.read_json("data/yelp_academic_dataset_business.json", lines=True)
+def read_raw_business_data() -> Generator[pd.DataFrame, None, None]:
+    """Generator that reads JSON file in chunks to avoid memory issues"""
+    chunk_size = 10000
+    for chunk in pd.read_json(
+        "data/yelp_academic_dataset_business.json", lines=True, chunksize=chunk_size
+    ):
+        yield chunk
 
-    return df
 
+def load_raw_business_data(engine_instance: engine.Engine) -> None:
+    """
+    Load raw Yelp business data into the database.
 
-def load_raw_business_data(df: pd.DataFrame, engine: engine.Engine) -> None:
+    :param engine_instance: SQLAlchemy engine instance
+    :type engine_instance: engine.Engine
+    """
     try:
-        with engine.connect() as connection:
-            df.to_sql(
-                "raw_yelp_business",
-                con=connection,
-                if_exists="replace",
-                index=False,
-                chunksize=1000,
-                dtype={
-                    "business_id": TEXT,
-                    "name": TEXT,
-                    "address": TEXT,
-                    "city": TEXT,
-                    "state": TEXT,
-                    "postal_code": TEXT,
-                    "latitude": FLOAT,
-                    "longitude": FLOAT,
-                    "stars": FLOAT,
-                    "review_count": INTEGER,
-                    "is_open": BOOLEAN,
-                    "attributes": JSONB,
-                    "categories": TEXT,
-                    "hours": JSONB,
-                },
-            )
-            print("Data loaded successfully.")
+        first_chunk = True
+        with engine_instance.connect() as connection:
+            for chunk in read_raw_business_data():
+                chunk.to_sql(
+                    "raw_yelp_review",
+                    con=connection,
+                    if_exists="replace" if first_chunk else "append",
+                    index=False,
+                    chunksize=1000,
+                    dtype={
+                        "business_id": TEXT,
+                        "name": TEXT,
+                        "address": TEXT,
+                        "city": TEXT,
+                        "state": TEXT,
+                        "postal_code": TEXT,
+                        "latitude": FLOAT,
+                        "longitude": FLOAT,
+                        "stars": FLOAT,
+                        "review_count": INTEGER,
+                        "is_open": BOOLEAN,
+                        "attributes": JSONB,
+                        "categories": TEXT,
+                        "hours": JSONB,
+                    },
+                )
+                first_chunk = False
+                print("Loaded chunk successfully.")
     except (IntegrityError, InternalError, OperationalError, ProgrammingError) as e:
         raise RuntimeError(f"Error loading data into database: {e}") from e
 
 
 if __name__ == "__main__":
-    engine = get_db_engine()
-    if engine is not None:
-        business_df = read_raw_business_data()
-        load_raw_business_data(business_df, engine)
+    db_engine = get_db_engine()
+    if db_engine is not None:
+        load_raw_business_data(engine_instance=db_engine)
         print("Raw business data loaded successfully.")
     else:
         print("Failed to create database engine.")

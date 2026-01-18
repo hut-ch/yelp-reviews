@@ -1,5 +1,3 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/postgres
 {
 	"name": "Yelp-Reviews-DBT",
 	"dockerComposeFile": "../docker-compose.yml",
@@ -15,7 +13,6 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				//"dbtLabsInc.dbt",
 				"innoverio.vscode-dbt-power-user",
 				"ms-python.python",
 				"ms-python.flake8",
@@ -55,8 +52,8 @@
 				"flake8.ignorePatterns": ["__init__.py"],
 
 				"pylint.args": ["--max-line-length=88"],
-				"pylint.cwd": "${workspaceFolder}/src",
-				"pylint.ignorePatterns": ["__init__.py", "dags/"]
+				"pylint.cwd": "${workspaceFolder}/python-scripts",
+				"pylint.ignorePatterns": ["__init__.py"]
 
 			}
 		}
