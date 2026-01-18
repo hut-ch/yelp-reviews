@@ -15,7 +15,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"dbtLabsInc.dbt",
+				//"dbtLabsInc.dbt",
 				"ms-python.python",
 				"ms-python.flake8",
 				"ms-python.mypy-type-checker",
@@ -36,7 +36,7 @@
 				"black-formatter.args": [
 					"--line-length=88"
 				],
-				
+
 				"isort.args": [
 					"--profile=black",
 					"--skip=.gitignore,.dockerignore,.devcontainer/",
@@ -56,7 +56,7 @@
 				"pylint.args": ["--max-line-length=88"],
 				"pylint.cwd": "${workspaceFolder}/src",
 				"pylint.ignorePatterns": ["__init__.py", "dags/"]
-				
+
 			}
 		}
 	}

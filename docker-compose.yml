@@ -5,26 +5,27 @@ services:
       dockerfile: Dockerfile
     image: hut-ch/dbt-yelp:dev
     volumes:
-      - .:/yelp-reviews:cached
+      - ./:/yelp-reviews:cached
+      - .dbt:/root/.dbt:cached
     command: sleep infinity
     depends_on:
       db:
-        condition: service_started
-    networks:
-      - dev-network
+        condition: service_healthy
 
   db:
-    image: postgres:latest
+    image: postgres:16-alpine
+    hostname: pg-yelp
     restart: unless-stopped
     volumes:
       - .db:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: yelp
       POSTGRES_PASSWORD: postgres
-    networks:
-      - dev-network
-
-networks:
-  dev-network:
-    driver: bridge
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d yelp"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
