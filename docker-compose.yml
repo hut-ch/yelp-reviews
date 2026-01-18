@@ -1,0 +1,30 @@
+services:
+  dbt-yelp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hut-ch/dbt-yelp:dev
+    volumes:
+      - .:/yelp-reviews:cached
+    command: sleep infinity
+    depends_on:
+      db:
+        condition: service_started
+    networks:
+      - dev-network
+
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - .db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge

@@ -1,0 +1,64 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/postgres
+{
+	"name": "Yelp-Reviews-DBT",
+	"dockerComposeFile": "../docker-compose.yml",
+	"service": "dbt-yelp",
+	"workspaceFolder": "/${localWorkspaceFolderBasename}",
+
+	"features": {
+		"ghcr.io/devcontainers/features/git:1": {}
+	},
+
+	"postAttachCommand": "pre-commit install && pre-commit autoupdate",
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbtLabsInc.dbt",
+				"ms-python.python",
+				"ms-python.flake8",
+				"ms-python.mypy-type-checker",
+				"ms-python.pylint",
+				"ms-python.black-formatter",
+				"ms-python.isort"
+			],
+
+			"settings": {
+				"[python]": {
+					"editor.defaultFormatter": "ms-python.black-formatter",
+					"editor.formatOnSave": true,
+					"editor.codeActionsOnSave": {
+						"source.organizeImports": "explicit"
+					}
+				},
+
+				"black-formatter.args": [
+					"--line-length=88"
+				],
+				
+				"isort.args": [
+					"--profile=black",
+					"--skip=.gitignore,.dockerignore,.devcontainer/",
+					"--line-length=88"
+				],
+
+				"mypy-type-checker.args": [
+					"-generated-members=pandas.*"
+				],
+				"mypy-type-checker.ignorePatterns":  ["__init__.py"],
+
+				"flake8.args": [
+					"--max-line-length=88"
+				],
+				"flake8.ignorePatterns": ["__init__.py"],
+
+				"pylint.args": ["--max-line-length=88"],
+				"pylint.cwd": "${workspaceFolder}/src",
+				"pylint.ignorePatterns": ["__init__.py", "dags/"]
+				
+			}
+		}
+	}
+
+}
